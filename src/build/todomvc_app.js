@@ -69,17 +69,11 @@
 	TodoController.prototype = new Object;
 	TodoController.prototype.constructor = TodoController;
 	function TodoController(user_preferences, display_filters, date_format, company_fields, last_saved_search_id) {
-
-	    var initial_state = pi.deepFreeze({
-	        data:null,
-	        errors:[],
-	        context:{
-	            status:"edit"
-	        }
-	    });
-
-	    //our first model
-	    pi.swap_model(initial_state);
+	    //our initial state
+	    pi.swap_model(pi.deepFreeze({
+	        todos:[],
+	        filter:null 
+	    }));
 	};
 
 
@@ -87,6 +81,46 @@
 	    pi.startWith(model, "INDEX")
 	    .then(views.render)
 
+	}
+
+	TodoController.prototype.add = function(title){
+	    pi.startWith(model, "ADD")
+	    .then(function(state) {return pi.pi_change(state,"todos", [{title:title, completed:false}].concat(state.todos));})
+	    .then(views.render)
+	    .then(pi.swap_model)
+
+	}
+
+	TodoController.prototype.mark = function(index, completed){
+	    pi.startWith(model, "MARK")
+	    .then(pi.change("todos["+index+"].completed", completed))
+	    .then(views.render)
+	    .then(pi.swap_model)
+	}
+
+	TodoController.prototype.filter = function(filter){
+	    pi.startWith(model, "filter")
+	    .then(pi.change("filter", filter))
+	    .then(views.render)
+	    .then(pi.swap_model)
+	}
+
+	TodoController.prototype.clear_completed = function(){
+	    pi.startWith(model, "filter")
+	    .then(function(state){return pi.pi_change(state,"todos", R.filter(function(todo){return !todo.completed;},state.todos));})
+	    .then(views.render)
+	    .then(pi.swap_model)
+	}
+
+
+	TodoController.prototype.delete = function(index){
+	    pi.startWith(model, "DELETE")
+	    .then(function(state) {
+	        var to_delete = pi.pi_value(state, "todos["+index+"]");
+	        return pi.pi_change(state,"todos", R.filter(function(todo){return todo!=to_delete;},state.todos));
+	    })
+	    .then(views.render)
+	    .then(pi.swap_model)
 	}
 
 
@@ -16490,19 +16524,135 @@
 
 	function render(state){
 	    pi.info("render");
-	    React.render(React.createElement(Todos, {state: state}),document.getElementById('main'));
+	    React.render(React.createElement(Todos, {app_state: state}),document.getElementById('main'));
 	    return state;
 	}
 
 	var Todos = pi.component(
-	            "Todos",
-	            function render() {
-	                
-	                return(
-	                    React.createElement("div", null, "Todos")
-	                );
-	              }
+	    "Todos",
+	    function render() {
+	    	var main=null;
+	    	var footer = null;
+	    	var todoItems=null;
+	    	var todos = R.isNil(this.props.app_state.filter)?this.props.app_state.todos:R.filter(R.propEq("completed", this.props.app_state.filter),this.props.app_state.todos);
+			// if () {
+			// 	footer =
+			// 		<TodoFooter/>;
+			// }    
+			var todoItems = todos.map(function(todo, index){
+				return React.createElement(TodoItem, {key: index, index: index, todo: todo})
+			})        	
+			if (todos.length) {
+				main = (
+					React.createElement("section", {className: "main"}, 
+						React.createElement("input", {
+							className: "toggle-all", 
+							type: "checkbox", 
+							onChange: this.toggleAll}
+						), 
+						React.createElement("ul", {className: "todo-list"}, 
+							todoItems
+						)
+					)
+				);
+				footer = React.createElement(TodoFooter, {count: todos.length})
+			}            	
+	        
+	        return(
+				React.createElement("div", null, 
+					React.createElement("header", {className: "header"}, 
+						React.createElement("h1", null, "todos"), 
+						React.createElement("input", {
+							className: "new-todo", 
+							placeholder: "What needs to be done?", 
+							onKeyDown: this.handleNewTodoKeyDown, 
+							onChange: this.handleChange, 						
+							autoFocus: true, 
+							value: this.state.text}
+						)
+					), 
+					main, 
+					footer
+				)                    
+	        );
+	    },
+	    [{
+	    	getInitialState:function(){
+	    		return {text:""};
+	    	},
+	    	handleChange: function (event) {
+				this.setState({text: event.target.value.trim()});
+				this.forceUpdate();
+			},
+			handleNewTodoKeyDown: function (event) {
+				if (event.keyCode !== 13) 
+					return;
+				//event.preventDefault();
+				var val = this.state.text;
+				this.setState({text: ""});
+				this.forceUpdate();
+				controller.add(val);
+			},
+
+	    }]
+
 	);
+
+
+	var TodoItem = pi.component("TodoItem", 
+		function renderTodoItem(){
+			var self = this;
+			return (
+					React.createElement("li", null, 
+						React.createElement("div", {className: "view"}, 
+							React.createElement("input", {
+								className: "toggle", 
+								type: "checkbox", 
+								checked: self.props.todo.completed, 
+								onChange: function(){console.log(1);controller.mark(self.props.index,self.props.todo.completed==false)}}
+							), 
+							React.createElement("label", {onDoubleClick: this.handleEdit}, 
+								this.props.todo.title
+							), 
+							React.createElement("button", {className: "destroy", onClick: function(){controller.delete(self.props.index)}})
+						), 
+						React.createElement("input", {
+							ref: "editField", 
+							className: "edit"}
+						)
+					)
+				);
+		}
+	);
+
+	var TodoFooter = pi.component("TodoFooter",
+		function renderFooter(){
+			return (
+				React.createElement("footer", {className: "footer"}, 
+					React.createElement("span", {className: "todo-count"}, 
+						React.createElement("strong", null, this.props.count), " left"
+					), 
+					React.createElement("ul", {className: "filters"}, 
+						React.createElement("li", null, 
+							React.createElement("a", {onClick: function(){controller.filter();}}, "All")
+						), 
+						' ', 
+						React.createElement("li", null, 
+							React.createElement("a", {onClick: function(){controller.filter(false);}}, "Active")
+						), 
+						' ', 
+						React.createElement("li", null, 
+							React.createElement("a", {onClick: function(){controller.filter(true);}}, "Completed")
+						)
+					), 
+					React.createElement("button", {
+							className: "clear-completed", 
+							onClick: controller.clear_completed}, 
+							"Clear completed"
+					)
+				)
+				);
+	})
 
 
 	exports.render = render;
