@@ -16542,14 +16542,15 @@
 	    	var main=null;
 	    	var footer = null;
 	    	var todoItems=null;
-	    	var todos = R.isNil(this.props.app_state.filter)?this.props.app_state.todos:R.filter(R.propEq("completed", this.props.app_state.filter),this.props.app_state.todos);
+	      var filter = this.props.app_state.filter;
+	    	var todos = R.isNil(filter)?this.props.app_state.todos:R.filter(R.propEq("completed", filter),this.props.app_state.todos);
 			// if () {
 			// 	footer =
 			// 		<TodoFooter/>;
-			// }    
+			// }
 			var todoItems = todos.map(function(todo, index){
 				return React.createElement(TodoItem, {key: index, index: index, todo: todo})
-			})        	
+			})
 			if (todos.length) {
 				main = (
 					React.createElement("section", {className: "main"}, 
@@ -16563,9 +16564,9 @@
 						)
 					)
 				);
-				footer = React.createElement(TodoFooter, {count: todos.length})
-			}            	
-	        
+				footer = React.createElement(TodoFooter, {count: todos.length, filter: filter})
+			}
+
 	        return(
 				React.createElement("div", null, 
 					React.createElement("header", {className: "header"}, 
@@ -16574,14 +16575,14 @@
 							className: "new-todo", 
 							placeholder: "What needs to be done?", 
 							onKeyDown: this.handleNewTodoKeyDown, 
-							onChange: this.handleChange, 						
+							onChange: this.handleChange, 
 							autoFocus: true, 
 							value: this.state.text}
 						)
 					), 
 					main, 
 					footer
-				)                    
+				)
 	        );
 	    },
 	    [{
@@ -16593,7 +16594,7 @@
 				this.forceUpdate();
 			},
 			handleNewTodoKeyDown: function (event) {
-				if (event.keyCode !== 13) 
+				if (event.keyCode !== 13)
 					return;
 				//event.preventDefault();
 				var val = this.state.text;
@@ -16607,7 +16608,7 @@
 	);
 
 
-	var TodoItem = pi.component("TodoItem", 
+	var TodoItem = pi.component("TodoItem",
 		function renderTodoItem(){
 			var self = this;
 			return (
@@ -16635,6 +16636,12 @@
 
 	var TodoFooter = pi.component("TodoFooter",
 		function renderFooter(){
+	    var self = this;
+	    var filter = this.state.filter;
+	    var allSelected = filter==null ? "selected" : "";
+	    var activeSelected = filter != null && !filter ? "selected" : "";
+	    var completedSelected = filter != null && filter ? "selected" : "";
+
 			return (
 				React.createElement("footer", {className: "footer"}, 
 					React.createElement("span", {className: "todo-count"}, 
@@ -16642,22 +16649,22 @@
 					), 
 					React.createElement("ul", {className: "filters"}, 
 						React.createElement("li", null, 
-							React.createElement("a", {onClick: function(){controller.filter();}}, "All")
+							React.createElement("a", {onClick: function(){self.displayAll();}, className: allSelected}, "All")
 						), 
 						' ', 
 						React.createElement("li", null, 
-							React.createElement("a", {onClick: function(){controller.filter(false);}}, "Active")
+							React.createElement("a", {onClick: function(){self.displayActive();}, className: activeSelected}, "Active")
 						), 
 						' ', 
 						React.createElement("li", null, 
-							React.createElement("a", {onClick: function(){controller.filter(true);}}, "Completed")
+							React.createElement("a", {onClick: function(){self.displayCompleted();}, className: completedSelected}, "Completed")
 						)
 					), 
 					React.createElement("button", {
 							className: "clear-completed", 
 							onClick: controller.undo}, 
 							" Undo"
-					), 				
+					), 
 					React.createElement("button", {
 							className: "clear-completed", 
 							onClick: controller.clear_completed}, 
@@ -16666,7 +16673,29 @@
 
 				)
 				);
-	})
+	},[{
+	  getInitialState: function(){
+	    var st = {filter: this.props.filter};
+	    return st;
+	  },
+	  displayAll: function(){
+	    controller.filter();
+	    this.setState({filter: null});
+	    this.forceUpdate();
+	  },
+	  displayActive: function(){
+	    controller.filter(false);
+	    this.setState({filter: false});
+	    this.forceUpdate();
+	  },
+	  displayCompleted: function(){
+	    controller.filter(true);
+	    this.setState({filter: true});
+	    this.forceUpdate();
+	  }
+	}]
+
+	)
 
 
 	exports.render = render;
