@@ -71,7 +71,7 @@
 	function TodoController(user_preferences, display_filters, date_format, company_fields, last_saved_search_id) {
 	    //our initial state
 	    pi.swap_model(pi.deepFreeze({
-	        todos:[],
+	        todos:null,
 	        filter:null 
 	    }));
 	};
@@ -85,7 +85,7 @@
 
 	TodoController.prototype.add = function(title){
 	    pi.startWith(model, "ADD")
-	    .then(function(state) {return pi.pi_change(state,"todos", [{title:title, completed:false}].concat(state.todos));})
+	    .then(function(state) {return pi.pi_change(state,"todos", [{title:title, completed:false}].concat(state.todos?state.todos:[]));})
 	    .then(views.render)
 	    .then(pi.swap_model)
 
@@ -16540,16 +16540,14 @@
 	    "Todos",
 	    function render() {
 	    	var main=null;
-	    	var footer = null;
-	    	var todoItems=null;
-	    	var todos = R.isNil(this.props.app_state.filter)?this.props.app_state.todos:R.filter(R.propEq("completed", this.props.app_state.filter),this.props.app_state.todos);
-			// if () {
-			// 	footer =
-			// 		<TodoFooter/>;
-			// }    
+	    	var app_state_todos = this.props.app_state.todos || [];
+	    	var todos = R.isNil(this.props.app_state.filter)?app_state_todos:R.filter(R.propEq("completed", this.props.app_state.filter),app_state_todos);
 			var todoItems = todos.map(function(todo, index){
 				return React.createElement(TodoItem, {key: index, index: index, todo: todo})
-			})        	
+			})  
+
+			var footer = this.props.app_state.todos && todos.length>=0?React.createElement(TodoFooter, {count: todos.length}):null;
+			     	
 			if (todos.length) {
 				main = (
 					React.createElement("section", {className: "main"}, 
@@ -16563,7 +16561,6 @@
 						)
 					)
 				);
-				footer = React.createElement(TodoFooter, {count: todos.length})
 			}            	
 	        
 	        return(
@@ -16595,7 +16592,6 @@
 			handleNewTodoKeyDown: function (event) {
 				if (event.keyCode !== 13) 
 					return;
-				//event.preventDefault();
 				var val = this.state.text;
 				this.setState({text: ""});
 				this.forceUpdate();

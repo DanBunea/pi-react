@@ -13,7 +13,7 @@ TodoController.prototype.constructor = TodoController;
 function TodoController(user_preferences, display_filters, date_format, company_fields, last_saved_search_id) {
     //our initial state
     pi.swap_model(pi.deepFreeze({
-        todos:[],
+        todos:null,
         filter:null 
     }));
 };
@@ -27,7 +27,7 @@ TodoController.prototype.index = function(){
 
 TodoController.prototype.add = function(title){
     pi.startWith(model, "ADD")
-    .then(state=> pi.pi_change(state,"todos", [{title:title, completed:false}].concat(state.todos)))
+    .then(state=> pi.pi_change(state,"todos", [{title:title, completed:false}].concat(state.todos?state.todos:[])))
     .then(views.render)
     .then(pi.swap_model)
 
