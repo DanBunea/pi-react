@@ -19,6 +19,7 @@ var Todos = pi.component(
     "Todos",
     function render() {
     	var main=null;
+<<<<<<< HEAD
     	var footer = null;
     	var todoItems=null;
       var filter = this.props.app_state.filter;
@@ -30,6 +31,16 @@ var Todos = pi.component(
 		var todoItems = todos.map(function(todo, index){
 			return <TodoItem key={index} index={index} todo={todo} />
 		})
+=======
+    	var app_state_todos = this.props.app_state.todos || [];
+    	var todos = R.isNil(this.props.app_state.filter)?app_state_todos:R.filter(R.propEq("completed", this.props.app_state.filter),app_state_todos);
+		var todoItems = todos.map(function(todo, index){
+			return <TodoItem key={index} index={index} todo={todo} />
+		})  
+
+		var footer = this.props.app_state.todos && todos.length>=0?<TodoFooter count={todos.length} />:null;
+		     	
+>>>>>>> 7989b76d7e64cc0308434acc8039627cfe97aa6b
 		if (todos.length) {
 			main = (
 				<section className="main">
@@ -43,9 +54,14 @@ var Todos = pi.component(
 					</ul>
 				</section>
 			);
+<<<<<<< HEAD
 			footer = <TodoFooter count={todos.length} filter={filter}/>
 		}
 
+=======
+		}            	
+        
+>>>>>>> 7989b76d7e64cc0308434acc8039627cfe97aa6b
         return(
 			<div>
 				<header className="header">
@@ -75,7 +91,6 @@ var Todos = pi.component(
 		handleNewTodoKeyDown: function (event) {
 			if (event.keyCode !== 13)
 				return;
-			//event.preventDefault();
 			var val = this.state.text;
 			this.setState({text: ""});
 			this.forceUpdate();
