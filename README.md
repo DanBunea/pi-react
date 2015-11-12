@@ -78,8 +78,8 @@ will show:
 
 <pre>
 {
-    todos:[{
-                   title:"new todo"
-              }]
+  todos:[{
+   title:"new todo"
+  }]
 }
 </pre>
