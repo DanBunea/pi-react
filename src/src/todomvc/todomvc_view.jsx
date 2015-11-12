@@ -96,7 +96,7 @@ var TodoItem = pi.component("TodoItem",
 							className="toggle"
 							type="checkbox"
 							checked={self.props.todo.completed}
-							onChange={function(){console.log(1);controller.mark(self.props.index,self.props.todo.completed==false)}}
+							onChange={function(){controller.mark(self.props.index,self.props.todo.completed==false)}}
 						/>
 						<label onDoubleClick={this.handleEdit}>
 							{this.props.todo.title}
@@ -134,9 +134,15 @@ var TodoFooter = pi.component("TodoFooter",
 				</ul>
 				<button
 						className="clear-completed"
+						onClick={controller.undo}>
+						&nbsp;Undo
+				</button>				
+				<button
+						className="clear-completed"
 						onClick={controller.clear_completed}>
 						Clear completed
 				</button>
+
 			</footer>
 			);
 })

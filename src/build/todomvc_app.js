@@ -123,7 +123,15 @@
 	    .then(pi.swap_model)
 	}
 
-
+	TodoController.prototype.undo = function() {
+	    pi.startWith(model,"UNDO")
+	        .then(function(state){
+	            if(hist.length > 1) hist.pop();
+	            model = R.last(hist);
+	            return model
+	        })
+	        .then(views.render)
+	};
 
 	exports.TodoController = TodoController;
 
@@ -16609,7 +16617,7 @@
 								className: "toggle", 
 								type: "checkbox", 
 								checked: self.props.todo.completed, 
-								onChange: function(){console.log(1);controller.mark(self.props.index,self.props.todo.completed==false)}}
+								onChange: function(){controller.mark(self.props.index,self.props.todo.completed==false)}}
 							), 
 							React.createElement("label", {onDoubleClick: this.handleEdit}, 
 								this.props.todo.title
@@ -16647,9 +16655,15 @@
 					), 
 					React.createElement("button", {
 							className: "clear-completed", 
+							onClick: controller.undo}, 
+							" Undo"
+					), 				
+					React.createElement("button", {
+							className: "clear-completed", 
 							onClick: controller.clear_completed}, 
 							"Clear completed"
 					)
+
 				)
 				);
 	})

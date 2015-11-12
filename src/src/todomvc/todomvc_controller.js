@@ -65,6 +65,14 @@ TodoController.prototype.delete = function(index){
     .then(pi.swap_model)
 }
 
-
+TodoController.prototype.undo = function() {
+    pi.startWith(model,"UNDO")
+        .then(function(state){
+            if(hist.length > 1) hist.pop();
+            model = R.last(hist);
+            return model
+        })
+        .then(views.render)
+};
 
 exports.TodoController = TodoController;
