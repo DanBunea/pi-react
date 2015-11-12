@@ -1,16 +1,19 @@
 # pi-react
 DIY next generation MVC framework, using promises in controllers, immutable persistent data structures as the model and Facebook React as the view
 
+<h3>Simplicity</h3>
+
 A framework that is simple enough for me is like this:
 
-1. I have some data
-2. I perform some transformations on it
-3. I render on screen
+1. I have some <b>data</b>
+2. I perform some <b>transformations</b> on it
+3. I <b>render on screen</b>
 
+Then <b>repeat</b> :)
 
-
-
-Then repeat :)
+<center>
+<img border="0" height="320" src="https://1.bp.blogspot.com/-8bqa7XqyVDw/VkSm4G7-HKI/AAAAAAAAl9o/v2W4B2yLEFc/s320/FullSizeRender.jpg" width="301">
+</center>
 
 
 Now if the data is the model, I do all the transformations in the controller, and display the result on the screen using the view.
