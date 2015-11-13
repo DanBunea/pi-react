@@ -32,7 +32,7 @@ var Todos = pi.component(
 					<input
 						className="toggle-all"
 						type="checkbox"
-						onChange={this.toggleAll}
+						onChange={function(ev){controller.mark_all(ev.target.checked)}}
 					/>
 					<ul className="todo-list">
 						{todoItems}

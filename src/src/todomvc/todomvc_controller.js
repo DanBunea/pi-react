@@ -40,6 +40,16 @@ TodoController.prototype.mark = function(index, completed){
     .then(pi.swap_model)
 }
 
+TodoController.prototype.mark_all = function(completed){
+    pi.startWith(model, "MARK")
+    .then(state=>{
+        var marked = R.map(todo=>pi.pi_change(todo,"completed",completed),state.todos);
+        return pi.pi_change(state, "todos", marked)
+    })
+    .then(views.render)
+    .then(pi.swap_model)
+}
+
 TodoController.prototype.filter = R.curry(function(filter){
     pi.startWith(model, "filter")
     .then(pi.change("filter", filter))
