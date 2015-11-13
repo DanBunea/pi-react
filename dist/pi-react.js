@@ -1,10 +1,3 @@
-/**
- * Created with PyCharm.
- * User: danbunea
- * Date: 28/11/14
- * Time: 10:36
- * To change this template use File | Settings | File Templates.
- */
 
 (function(){
     var debug=false;
@@ -80,7 +73,7 @@
                         return !update_props;
                     };
 
-    exports.component = function component(displayName, render, mixins, shouldComponentUpdate){
+    function component(displayName, render, mixins, shouldComponentUpdate){
                 if(!mixins)
                 {
                     mixins = []
@@ -210,7 +203,7 @@
                     else {
                     }
                 }
-        	});
+            });
         return dat;
     }
 
@@ -462,6 +455,7 @@
 
     pi = {};
 
+    pi.component = component;
     pi.translate=translate;
     pi.deepFreeze = deepFreeze;
     pi.startWith= startWith;
@@ -497,5 +491,3 @@
 
 
 })("pi")
-
-
