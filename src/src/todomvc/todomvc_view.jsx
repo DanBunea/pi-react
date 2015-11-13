@@ -64,13 +64,13 @@ var Todos = pi.component(
     		return {text:""};
     	},
     	handleChange: function (event) {
-			this.setState({text: event.target.value.trim()});
+			this.setState({text: event.target.value});
 			this.forceUpdate();
 		},
 		handleNewTodoKeyDown: function (event) {
-			if (event.keyCode !== 13)
+			if (event.keyCode !== 13 || event.keyCode==32)
 				return;
-			var val = this.state.text;
+			var val = this.state.text.trim();
 			this.setState({text: ""});
 			this.forceUpdate();
 			controller.add(val);
