@@ -40,12 +40,12 @@ TodoController.prototype.mark = function(index, completed){
     .then(pi.swap_model)
 }
 
-TodoController.prototype.filter = function(filter){
+TodoController.prototype.filter = R.curry(function(filter){
     pi.startWith(model, "filter")
     .then(pi.change("filter", filter))
     .then(views.render)
     .then(pi.swap_model)
-}
+});
 
 TodoController.prototype.clear_completed = function(){
     pi.startWith(model, "filter")

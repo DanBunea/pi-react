@@ -110,10 +110,10 @@ var TodoItem = pi.component("TodoItem",
 var TodoFooter = pi.component("TodoFooter",
 	function renderFooter(){
     var self = this;
-    var filter = this.state.filter;
-    var allSelected = filter==null ? "selected" : "";
-    var activeSelected = filter != null && !filter ? "selected" : "";
-    var completedSelected = filter != null && filter ? "selected" : "";
+    var filter = this.props.filter;
+    var allSelected = R.isNil(filter)? "selected" : "";
+    var activeSelected = filter===false ? "selected" : "";
+    var completedSelected = filter===true ? "selected" : "";
 
 		return (
 			<footer className="footer">
@@ -122,15 +122,15 @@ var TodoFooter = pi.component("TodoFooter",
 				</span>
 				<ul className="filters">
 					<li>
-						<a onClick={function(){self.displayAll();}} className={allSelected}>All</a>
+						<a onClick={function(){controller.filter(undefined);}} className={allSelected}>All</a>
 					</li>
 					{' '}
 					<li>
-						<a onClick={function(){self.displayActive();}} className={activeSelected}>Active</a>
+						<a onClick={function(){controller.filter(false);}} className={activeSelected}>Active</a>
 					</li>
 					{' '}
 					<li>
-						<a onClick={function(){self.displayCompleted();}} className={completedSelected}>Completed</a>
+						<a onClick={function(){controller.filter(true);}} className={completedSelected}>Completed</a>
 					</li>
 				</ul>
 				<button
@@ -146,28 +146,7 @@ var TodoFooter = pi.component("TodoFooter",
 
 			</footer>
 			);
-},[{
-  getInitialState: function(){
-    var st = {filter: this.props.filter};
-    return st;
-  },
-  displayAll: function(){
-    controller.filter();
-    this.setState({filter: null});
-    this.forceUpdate();
-  },
-  displayActive: function(){
-    controller.filter(false);
-    this.setState({filter: false});
-    this.forceUpdate();
-  },
-  displayCompleted: function(){
-    controller.filter(true);
-    this.setState({filter: true});
-    this.forceUpdate();
-  }
-}]
-
+}
 )
 
 
