@@ -369,6 +369,55 @@
 
 
 
+    function pi_push(obj,path,val)
+    {
+        assert(arguments.length==3, "pi_push needs 3 arguments!!!")
+        assert(obj instanceof Object, "pi_push obj needs to be Object or {}!!!")
+        assert(typeof path == 'string' || path instanceof String, "pi_push path (cursor) needs to be string!!!")
+
+
+
+        var array = pi_value(obj, path);
+        assert(array instanceof Array, "pi_push needs to be Array!!!")
+        if(array && array instanceof Array)
+        {
+            var new_array = array.concat([val]);
+            if(obj["_changes"])
+                obj = log_changes(obj, path, new_array);
+            return pi_change(obj, path, new_array);
+        }
+
+        return obj;
+    }
+
+
+    function pi_filter_array(obj,path,filter_function)
+    {
+        assert(arguments.length==3, "pi_filter_array needs 3 arguments!!!")
+        assert(obj instanceof Object, "pi_filter_array obj needs to be Object or {}!!!")
+        assert(filter_function instanceof Function, "pi_filter_array filter_function needs to be Function!!!")
+        assert(typeof path == 'string' || path instanceof String, "pi_filter_array path (cursor) needs to be string!!!")
+
+
+
+
+        var array = pi_value(obj, path);
+        assert(array instanceof Array, "pi_filter_array needs to be Array!!!")
+        if(array && array instanceof Array)
+        {
+            var new_array = array.filter(filter_function);
+            if(obj["_changes"])
+                obj = log_changes(obj, path, new_array);
+            return pi_change(obj, path, new_array);
+        }
+
+        return obj;
+    }
+
+
+
+
+
 
 
         function pi_delete(obj,path)
@@ -479,6 +528,8 @@
     pi.copy = R.curry(function(path1, path2, obj){info("pi.copy",path1, path2);return pi_copy(obj, path1, path2)});
     pi.delete = R.curry(function(path, obj){info("pi.delete",path);return pi_delete(obj, path)});
     pi.move = R.curry(function(path1, path2, obj){info("pi.move",path1, path2);return pi_move(obj, path1, path2)});
+    pi.push = R.curry(function(path, val, obj){info("pi.push",path, val);return pi_push(obj, path, val)});
+    pi.filter_array = R.curry(function(path, func, obj){info("pi.filter_array",path);return pi_filter_array(obj, path, func)});
 
     pi.swap_model_add_history=swap_model_add_history;
     pi.swap_model=swap_model;
