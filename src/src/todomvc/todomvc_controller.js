@@ -10,7 +10,7 @@ pi = require('../pi-react/pi-react.js');
 
 TodoController.prototype = new Object;
 TodoController.prototype.constructor = TodoController;
-function TodoController(user_preferences, display_filters, date_format, company_fields, last_saved_search_id) {
+function TodoController() {
     //our initial state
     pi.swap_model(pi.deepFreeze({
         todos:null,
